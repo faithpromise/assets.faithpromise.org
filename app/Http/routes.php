@@ -14,10 +14,26 @@
 use Illuminate\Http\Response;
 use Intervention\Image\ImageManagerStatic as Image;
 
+function add_headers($response, $img) {
+    $response->header('Content-Type', $img->mime());
+    $response->header('Cache-Control', 'max-age=31536000');
+    return $response;
+}
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/series-fade-out/{series_ident}.{ext}', function($series_ident, $ext) {
+
+    $src_path = public_path('images/series/' . $series_ident . '-tall.' . $ext);
+    $fill_image_path = public_path('images/overlays/hero-video-overlay.png');
+
+    $img = Image::make($src_path)->resize(720, 405)->fill($fill_image_path);
+
+    return add_headers($img->response(null, 80), $img);
+
+})->where('ext', '(jpg|png|gif)');
 
 Route::get('/{display_size}/{image_size}/{image_path}', function ($display_size, $image_size, $image_path) {
 
@@ -59,9 +75,7 @@ Route::get('/{display_size}/{image_size}/{image_path}', function ($display_size,
     });
 
     $response = new Response($img->encode(null, $compression), 200);
-    $response->header('Content-Type', $img->mime());
-    $response->header('Cache-Control', 'max-age=31536000');
 
-    return $response;
+    return add_headers($response, $img);
 
 })->where('display_size', '(sm|md|lg|xl)')->where('image_size', '(full|half|third|quarter)')->where('image_path', '.*');
