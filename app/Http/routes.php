@@ -63,16 +63,23 @@ Route::get('/{display_size}/{image_size}/{image_path}', function ($display_size,
     $src_path = public_path($image_path);
     $new_width = (int)(($display_sizes[$display_size] * $pixel_density) * $image_sizes[$image_size]);
     $compression = $compressions[$display_size];
+    $colors = (int)Input::get('colors');
 
     // Throw 404 if image does not exist
     if (! file_exists($src_path)) {
         return response('image not found', 404);
     }
 
-    $img = Image::make($src_path)->resize($new_width, null, function($constraint) {
+    $img = Image::make($src_path);
+
+    $img->resize($new_width, null, function($constraint) {
         $constraint->aspectRatio();
         $constraint->upsize();
     });
+
+    if ($colors > 0) {
+        $img->limitColors($colors, '#ffffff');
+    }
 
     $response = new Response($img->encode(null, $compression), 200);
 
