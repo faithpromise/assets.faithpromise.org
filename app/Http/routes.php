@@ -11,6 +11,7 @@
 |
 */
 
+use GuzzleHttp\Client;
 use Illuminate\Http\Response;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -24,7 +25,28 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/series-fade-out/{series_ident}.{ext}', function($series_ident, $ext) {
+Route::get('/staff-8bit.jpg', function () {
+
+    $client = new Client();
+    $end_point = 'http://faithpromise.192.168.10.10.xip.io/staff/8bit.json';
+    $response = $client->get($end_point);
+    $staff = json_decode($response->getBody(true));
+
+    $width = 160;
+    $height = $width * count($staff);
+    $image = Image::canvas($width, $height);
+
+    for($i = 0; $i < count($staff); ++$i) {
+        $path = public_path('images/staff/' . $staff[$i] . '-8bit-square.jpg');
+        $staff_image = Image::make($path)->resize($width, $width);
+        $y_position = $width * $i;
+        $image->insert($staff_image, 'top-left', 0, $y_position);
+    }
+
+    return $image->response();
+});
+
+Route::get('/series-fade-out/{series_ident}.{ext}', function ($series_ident, $ext) {
 
     $src_path = public_path('images/series/' . $series_ident . '-tall.' . $ext);
     $fill_image_path = public_path('images/overlays/hero-video-overlay.png');
@@ -66,13 +88,13 @@ Route::get('/{display_size}/{image_size}/{image_path}', function ($display_size,
     $colors = (int)Input::get('colors');
 
     // Throw 404 if image does not exist
-    if (! file_exists($src_path)) {
+    if (!file_exists($src_path)) {
         return response('image not found', 404);
     }
 
     $img = Image::make($src_path);
 
-    $img->resize($new_width, null, function($constraint) {
+    $img->resize($new_width, null, function ($constraint) {
         $constraint->aspectRatio();
         $constraint->upsize();
     });
