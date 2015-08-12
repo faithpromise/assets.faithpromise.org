@@ -24,17 +24,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/series-fade-out/{series_ident}.{ext}', function($series_ident, $ext) {
-
-    $src_path = public_path('images/series/' . $series_ident . '-tall.' . $ext);
-    $fill_image_path = public_path('images/overlays/hero-video-overlay.png');
-
-    $img = Image::make($src_path)->resize(720, 405)->fill($fill_image_path);
-
-    return add_headers($img->response(null, 80), $img);
-
-})->where('ext', '(jpg|png|gif)');
-
 Route::get('/{display_size}/{image_size}/{image_path}', function ($display_size, $image_size, $image_path) {
 
     $pixel_density = 2;
