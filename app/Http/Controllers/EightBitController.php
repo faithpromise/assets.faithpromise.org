@@ -31,7 +31,7 @@ class EightBitController extends BaseController {
     }
 
     private function getEightBitData() {
-        $response = (new HttpClient())->get('http://faithpromise.192.168.10.10.xip.io/staff/8bit.json');
+        $response = (new HttpClient())->get('http://faithpromise.org/staff/8bit.json');
 
         return json_decode($response->getBody(true));
     }
