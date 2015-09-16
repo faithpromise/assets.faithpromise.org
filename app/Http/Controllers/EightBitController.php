@@ -16,6 +16,7 @@ class EightBitController extends BaseController {
         $staff = $this->getEightBitData();
         $size = $request->input('size', 'desktop');
         $icon_width = $this->getIconSize($size);
+        $max_age_days = 30;
 
         for ($i = 0; $i < count($staff); ++$i) {
 
@@ -25,8 +26,10 @@ class EightBitController extends BaseController {
         }
 
         $response = Response::make(implode("\n", $css));
+        $response->header('Cache-Control', 'max-age=' . ($max_age_days * 24 * 60 * 60) . ', public');
+        $response->header('Content-Type', 'text/css');
 
-        return $response->header('Content-Type', 'text/css');
+        return $response;
 
     }
 

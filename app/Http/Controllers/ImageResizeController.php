@@ -11,6 +11,7 @@ class ImageResizeController extends BaseController {
 
     public function index($display_size, $image_size, $image_path) {
 
+        $max_age_days = 30;
         $pixel_density = 2;
 
         $display_sizes = [
@@ -56,16 +57,12 @@ class ImageResizeController extends BaseController {
         }
 
         $response = Response::make($img->encode(null, $compression), 200);
-
-        return $this->addHeaders($response, $img);
-
-    }
-
-    private function addHeaders($response, $img) {
         $response->header('Content-Type', $img->mime());
-        $response->header('Cache-Control', 'max-age=31536000');
+        $response->header('Cache-Control', 'max-age=' . ($max_age_days * 24 * 60 * 60) . ', public');
 
         return $response;
+
     }
+
 
 }
