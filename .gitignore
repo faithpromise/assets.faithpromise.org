@@ -1,10 +1,2 @@
 .DS_Store
-.env
 .idea
-/_release/*
-!/_release/.gitkeep
-/vendor
-/node_modules
-/bower_components
-/public/build
-Homestead.yaml
